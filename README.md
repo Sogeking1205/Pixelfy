@@ -1,4 +1,5 @@
 # Pixelfy 🎨
+<img width="2816" height="1536" alt="Logo_Pixelfy" src="https://github.com/user-attachments/assets/bb172a3d-03bc-4662-90bf-6e6d5c07191b" />
 
 **Pixelfy** es un software de dibujo digital de escritorio diseñado específicamente para la creación de "Pixel Art". Este proyecto fue desarrollado como aplicación práctica de los principios de la Programación Orientada a Objetos (POO) utilizando Java.
 
