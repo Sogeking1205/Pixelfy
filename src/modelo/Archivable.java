@@ -10,4 +10,10 @@ package modelo;
  */
 public interface Archivable {
     
+    public void guardarArchivo();
+    
+    public void cargarArchivo();
+    
+    public void validarArchivo();
+    
 }
