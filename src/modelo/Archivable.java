@@ -14,6 +14,6 @@ public interface Archivable {
     
     public void cargarArchivo();
     
-    public void validarArchivo();
+    public boolean validarArchivo();
     
 }
