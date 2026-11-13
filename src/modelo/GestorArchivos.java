@@ -80,7 +80,7 @@ public class GestorArchivos implements Archivable{
             
             lienzo.setFilas(filas);
             lienzo.setColumnas(columnas);
-            lienzo.inicializarCuadricula();
+            Lienzo lienzoTemporal = new Lienzo(filas, columnas);
             
             //Aca se lee el archivo y se reconstruye
             for (int i = 0; i < filas; i++) {
@@ -89,9 +89,14 @@ public class GestorArchivos implements Archivable{
                 
                 for (int j = 0; j < columnas; j++) {
                     // Modificamos color de cada Casilla con la guardada en el texto
-                    lienzo.pintarCasilla(i, j, hexColores[j]);
+                    lienzoTemporal.pintarCasilla(i, j, hexColores[j]);
                 }
             }
+            
+            lienzo.setFilas(filas);
+            lienzo.setColumnas(columnas);
+            lienzo.setCuadricula(lienzoTemporal.getCuadricula());
+            
             System.out.println("Archivo cargado con éxito.");
             
         }catch(IOException | NumberFormatException e){
