@@ -32,12 +32,12 @@ public class GestorArchivos implements Archivable{
     }
 
     @Override
-    public void guardarArchivo() {
+    public void guardarArchivo(Lienzo lienzo) {
         //Uso de try-catch para evitar error al guardar
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(getRutaArchivo()))){
-            int filas = Lienzo.getFilas();
-            int columnas = Lienzo.getColumnas();
-            Casilla[][] cuadricula = Lienzo.getCuadricula();
+            int filas = lienzo.getFilas();
+            int columnas = lienzo.getColumnas();
+            Casilla[][] cuadricula = lienzo.getCuadricula();
             
             //Primero se guarda el tamaño de filas y columnas para que se puedan leer primero al abrir el archivo de texto
             writer.write(filas + " " + columnas);
@@ -47,7 +47,7 @@ public class GestorArchivos implements Archivable{
             for(int i=0; i<filas; i++){
                 for(int j=0; j<columnas; j++){
                     Casilla casilla = cuadricula[i][j];
-                    String hex = Lienzo.getColor();
+                    String hex = casilla.getColor();
                     if(hex == null || hex.isEmpty()){
                         hex = "#FFFFFF";
                     }
@@ -78,8 +78,8 @@ public class GestorArchivos implements Archivable{
             int filas = Integer.parseInt(dimensiones[0]);
             int columnas = Integer.parseInt(dimensiones[1]);
             
-            Lienzo.setFilas(filas);
-            Lienzo.setColumnas(columnas);
+            lienzo.setFilas(filas);
+            lienzo.setColumnas(columnas);
             lienzo.inicializarCuadricula();
             
             //Aca se lee el archivo y se reconstruye

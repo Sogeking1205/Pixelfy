@@ -10,7 +10,7 @@ package modelo;
  */
 public interface Archivable {
     
-    public void guardarArchivo();
+    public void guardarArchivo(Lienzo lienzo);
     
     public void cargarArchivo();
     
