@@ -18,11 +18,13 @@ public class pantallaCarga extends javax.swing.JDialog {
     public pantallaCarga(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        iniciarCarga();//llamamos e iniciamos la carga 
     }
 
     private void iniciarCarga() {
         javax.swing.Timer timer = new javax.swing.Timer(50, new java.awt.event.ActionListener() {
-            int progreso = 0;
+            int progreso = 0;//inciamos la barra vacia
 
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -32,8 +34,7 @@ public class pantallaCarga extends javax.swing.JDialog {
                 if (progreso >= 100) {
                     ((javax.swing.Timer) e.getSource()).stop();
                     dispose(); // Cierra esta pantalla de carga
-                    // Aquí abres tu ventana principal, por ejemplo:
-                    // new MenuPrincipal().setVisible(true);
+                    // abre la ventana principal
                 }
             }
         });
