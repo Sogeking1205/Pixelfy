@@ -1,13 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package modelo;
 
-/**
- *
- * @author asnu1
- */
 public class Lapiz extends Herramienta{
-    
+    public Lapiz (){
+        this.nombre="Lapiz";
+    }
+
+    @Override
+    public void aplicar (String[][] Lienzo, int x, int y, String color){
+        if (posicion(Lienzo, x, y)){
+            Lienzo[x][y] = color;
+        }
+    }
 }
