@@ -4,6 +4,18 @@
  */
 package vista;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.io.File;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import modelo.Borrador;
+import modelo.Cubeta;
+import modelo.GestorArchivos;
+import modelo.Lapiz;
+import modelo.Lienzo;
 /**
  *
  * @author asnu1
@@ -18,6 +30,23 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public VentanaPrincipal() {
         initComponents();
     }
+    
+    private Lienzo lienzoActual;
+    private PanelLienzo panelLienzo;
+
+    // ESTE ES EL CONSTRUCTOR DE LA VENTANA
+    public VentanaPrincipal(Lienzo lienzo) {
+        initComponents();
+        this.lienzoActual = lienzo;
+        
+        // Creamos el panel visual y lo ponemos en toda la ventana
+        this.panelLienzo = new PanelLienzo(this.lienzoActual);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(panelLienzo, BorderLayout.CENTER);
+        
+        setLocationRelativeTo(null);
+        setTitle("Pixelfy - Lienzo (" + lienzo.getFilas() + "x" + lienzo.getColumnas() + ")");
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,7 +57,57 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        menuOperaciones = new javax.swing.JMenu();
+        IMNuevoLienzo = new javax.swing.JMenuItem();
+        MIAbrirLienzo = new javax.swing.JMenuItem();
+        IMGuardarLienzo = new javax.swing.JMenuItem();
+        MILimpiarLienzo = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+
+        jMenuItem4.setText("jMenuItem4");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        menuOperaciones.setText("Archivos");
+
+        IMNuevoLienzo.setText("Nuevo archivo");
+        IMNuevoLienzo.addActionListener(this::IMNuevoLienzoActionPerformed);
+        menuOperaciones.add(IMNuevoLienzo);
+
+        MIAbrirLienzo.setText("Abrir Lienzo");
+        menuOperaciones.add(MIAbrirLienzo);
+
+        IMGuardarLienzo.setText("Guardar Lienzo");
+        menuOperaciones.add(IMGuardarLienzo);
+
+        MILimpiarLienzo.setText("Limpiar Lienzo");
+        menuOperaciones.add(MILimpiarLienzo);
+
+        jMenuBar1.add(menuOperaciones);
+
+        jMenu2.setText("Herramientas");
+
+        jMenuItem2.setText("Lapiz");
+        jMenu2.add(jMenuItem2);
+
+        jMenuItem1.setText("Cubeta");
+        jMenu2.add(jMenuItem1);
+
+        jMenuItem3.setText("borrador");
+        jMenu2.add(jMenuItem3);
+
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Seleccionar color");
+        jMenuBar1.add(jMenu3);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -38,11 +117,15 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 584, Short.MAX_VALUE)
+            .addGap(0, 561, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void IMNuevoLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IMNuevoLienzoActionPerformed
+        
+    }//GEN-LAST:event_IMNuevoLienzoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -70,5 +153,17 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem IMGuardarLienzo;
+    private javax.swing.JMenuItem IMNuevoLienzo;
+    private javax.swing.JMenuItem MIAbrirLienzo;
+    private javax.swing.JMenuItem MILimpiarLienzo;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenu menuOperaciones;
     // End of variables declaration//GEN-END:variables
 }

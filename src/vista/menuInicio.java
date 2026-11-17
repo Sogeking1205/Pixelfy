@@ -22,6 +22,8 @@ public class menuInicio extends javax.swing.JFrame {
      */
     public menuInicio() {
         initComponents();
+        setLocationRelativeTo(null);
+        setTitle("Pixelfy - Menú Principal");
     }
 
     /**
@@ -161,9 +163,8 @@ public class menuInicio extends javax.swing.JFrame {
             // 1. Creamos el modelo Lienzo con las dimensiones elegidas
             Lienzo nuevoLienzo = new Lienzo(dimension, dimension);
 
-            // 2. Lo pasamos a la ventana del editor (descomenta cuando la crees)
-            // new VentanaEditor(nuevoLienzo).setVisible(true);
-            // this.dispose();
+            new VentanaPrincipal(nuevoLienzo).setVisible(true);
+            this.dispose();
 
             JOptionPane.showMessageDialog(this, "Lienzo modelo creado: " + dimension + "x" + dimension);
         }
