@@ -44,18 +44,21 @@ public class menuInicio extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelFondo.setBackground(new java.awt.Color(51, 51, 51));
+        panelFondo.setBackground(new java.awt.Color(204, 204, 255));
 
+        JLTitulo.setBackground(new java.awt.Color(0, 204, 0));
         JLTitulo.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 2, 12)); // NOI18N
+        JLTitulo.setForeground(new java.awt.Color(0, 153, 0));
         JLTitulo.setText("PIXELFY");
+        JLTitulo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel1.setText("¿QUE IDEA QUIERE PIXELIZAR?");
 
-        btnLienzoNuevo.setBackground(new java.awt.Color(204, 204, 255));
+        btnLienzoNuevo.setBackground(new java.awt.Color(255, 255, 204));
         btnLienzoNuevo.setText("Crear nuevo lienzo");
         btnLienzoNuevo.addActionListener(this::btnLienzoNuevoActionPerformed);
 
-        btnAbrirLienzo.setBackground(new java.awt.Color(204, 204, 255));
+        btnAbrirLienzo.setBackground(new java.awt.Color(255, 255, 204));
         btnAbrirLienzo.setText("Continuar/Abrir lienzo");
         btnAbrirLienzo.addActionListener(this::btnAbrirLienzoActionPerformed);
 
@@ -74,25 +77,25 @@ public class menuInicio extends javax.swing.JFrame {
                         .addComponent(btnSalir)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFondoLayout.createSequentialGroup()
-                        .addComponent(JLTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82))))
+                        .addComponent(JLTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(90, 90, 90))))
             .addGroup(panelFondoLayout.createSequentialGroup()
                 .addGap(37, 37, 37)
-                .addGroup(panelFondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnAbrirLienzo)
-                    .addComponent(jLabel1)
-                    .addComponent(btnLienzoNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 33, Short.MAX_VALUE))
+                .addGroup(panelFondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLienzoNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAbrirLienzo))
+                .addGap(0, 21, Short.MAX_VALUE))
         );
         panelFondoLayout.setVerticalGroup(
             panelFondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelFondoLayout.createSequentialGroup()
                 .addComponent(JLTitulo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(btnLienzoNuevo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addComponent(btnAbrirLienzo)
                 .addGap(18, 18, 18)
                 .addComponent(btnSalir))
@@ -135,9 +138,9 @@ public class menuInicio extends javax.swing.JFrame {
             Lienzo lienzoCargado = new Lienzo(16, 16); // Tamaño temporal; cargarArchivo lo actualiza
             gestor.cargarArchivo(lienzoCargado);
 
-            // 4. Abrimos el editor ya con el dibujo cargado (descomenta cuando crees VentanaEditor)
-            // new VentanaEditor(lienzoCargado).setVisible(true);
-            // this.dispose();
+            // 4. Abrimos el editor ya con el dibujo 
+            new VentanaPrincipal(lienzoCargado).setVisible(true);
+            this.dispose();
 
             JOptionPane.showMessageDialog(this, 
                 "Proyecto cargado: " + lienzoCargado.getFilas() + "x" + lienzoCargado.getColumnas());
@@ -174,31 +177,6 @@ public class menuInicio extends javax.swing.JFrame {
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new menuInicio().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel JLTitulo;

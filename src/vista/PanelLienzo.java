@@ -26,6 +26,8 @@ public class PanelLienzo extends JPanel {
     private Herramienta herramientaActual;
     private String colorActual = "#000000"; // Negro por defecto
     private boolean mostrarCuadricula = true;
+    private boolean validarModificado = false;
+    
 
     public PanelLienzo(Lienzo lienzo) {
         this.lienzo = lienzo;
@@ -116,7 +118,8 @@ public class PanelLienzo extends JPanel {
                     lienzo.pintarCasilla(i, j, colorResultado);
                 }
             }
-
+            
+            this.validarModificado = true;
             repaint();
         }
     }
@@ -148,6 +151,15 @@ public class PanelLienzo extends JPanel {
         repaint();
     }
 
+    public boolean isValidarModificado() {
+        return validarModificado;
+    }
+
+    public void setValidarModificado(boolean validarModificado) {
+        this.validarModificado = validarModificado;
+    }
+
+    
     public Lienzo getLienzo() {
         return lienzo;
     }

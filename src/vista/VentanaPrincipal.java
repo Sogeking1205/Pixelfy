@@ -6,6 +6,7 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.HeadlessException;
 import java.io.File;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
@@ -27,27 +28,59 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     /**
      * Creates new form VentanaPrincipal
      */
-    public VentanaPrincipal() {
-        initComponents();
-    }
-    
     private Lienzo lienzoActual;
     private PanelLienzo panelLienzo;
+    private boolean guardado = true;
 
     // ESTE ES EL CONSTRUCTOR DE LA VENTANA
     public VentanaPrincipal(Lienzo lienzo) {
         initComponents();
         this.lienzoActual = lienzo;
         
-        // Creamos el panel visual y lo ponemos en toda la ventana
         this.panelLienzo = new PanelLienzo(this.lienzoActual);
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(panelLienzo, BorderLayout.CENTER);
         
         setLocationRelativeTo(null);
         setTitle("Pixelfy - Lienzo (" + lienzo.getFilas() + "x" + lienzo.getColumnas() + ")");
+
+        // Evita que la ventana se cierre sola al presionar la X
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        // Intercepta el clic en la X de la ventana
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                confirmarSalida();
+            }
+        });
     }
 
+    private void confirmarSalida() {
+        if (!panelLienzo.isValidarModificado()) {
+        System.exit(0);
+        return;
+    }
+
+    int opcion = JOptionPane.showConfirmDialog(
+            this,
+            "Tienes cambios sin guardar en tu lienzo.\n¿Deseas guardar antes de salir?",
+            "Salir de Pixelfy",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE
+    );
+
+    if (opcion == JOptionPane.YES_OPTION) {
+        IMGuardarLienzoActionPerformed(null);
+        // Solo sale si realmente guardó (si canceló el JFileChooser, isModificado sigue en true)
+        if (!panelLienzo.isValidarModificado()) {
+            System.exit(0);
+        }
+    } else if (opcion == JOptionPane.NO_OPTION) {
+        System.exit(0);
+    }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -64,11 +97,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         MIAbrirLienzo = new javax.swing.JMenuItem();
         IMGuardarLienzo = new javax.swing.JMenuItem();
         MILimpiarLienzo = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        mILapiz = new javax.swing.JMenu();
+        miLapiz = new javax.swing.JMenuItem();
+        miCubeta = new javax.swing.JMenuItem();
+        miBorrador = new javax.swing.JMenuItem();
+        menuColor = new javax.swing.JMenu();
 
         jMenuItem4.setText("jMenuItem4");
 
@@ -81,31 +114,42 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         menuOperaciones.add(IMNuevoLienzo);
 
         MIAbrirLienzo.setText("Abrir Lienzo");
+        MIAbrirLienzo.addActionListener(this::MIAbrirLienzoActionPerformed);
         menuOperaciones.add(MIAbrirLienzo);
 
         IMGuardarLienzo.setText("Guardar Lienzo");
+        IMGuardarLienzo.addActionListener(this::IMGuardarLienzoActionPerformed);
         menuOperaciones.add(IMGuardarLienzo);
 
         MILimpiarLienzo.setText("Limpiar Lienzo");
+        MILimpiarLienzo.addActionListener(this::MILimpiarLienzoActionPerformed);
         menuOperaciones.add(MILimpiarLienzo);
 
         jMenuBar1.add(menuOperaciones);
 
-        jMenu2.setText("Herramientas");
+        mILapiz.setText("Herramientas");
 
-        jMenuItem2.setText("Lapiz");
-        jMenu2.add(jMenuItem2);
+        miLapiz.setText("Lapiz");
+        miLapiz.addActionListener(this::miLapizActionPerformed);
+        mILapiz.add(miLapiz);
 
-        jMenuItem1.setText("Cubeta");
-        jMenu2.add(jMenuItem1);
+        miCubeta.setText("Cubeta");
+        miCubeta.addActionListener(this::miCubetaActionPerformed);
+        mILapiz.add(miCubeta);
 
-        jMenuItem3.setText("borrador");
-        jMenu2.add(jMenuItem3);
+        miBorrador.setText("borrador");
+        miBorrador.addActionListener(this::miBorradorActionPerformed);
+        mILapiz.add(miBorrador);
 
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(mILapiz);
 
-        jMenu3.setText("Seleccionar color");
-        jMenuBar1.add(jMenu3);
+        menuColor.setText("Seleccionar color");
+        menuColor.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menuColorMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(menuColor);
 
         setJMenuBar(jMenuBar1);
 
@@ -113,7 +157,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1062, Short.MAX_VALUE)
+            .addGap(0, 495, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,46 +168,137 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void IMNuevoLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IMNuevoLienzoActionPerformed
-        
+        String[] opciones = {"16x16", "32x32", "64x64"};
+        String seleccion = (String) JOptionPane.showInputDialog(
+                this, "Selecciona el tamaño del lienzo:", "Nuevo Lienzo",
+                JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[1]);
+
+        if (seleccion != null) {
+            int dim = Integer.parseInt(seleccion.split("x")[0]);
+            this.lienzoActual = new Lienzo(dim, dim);
+            this.panelLienzo.setLienzo(this.lienzoActual);
+            setTitle("Pixelfy - Lienzo (" + dim + "x" + dim + ")");
+        }
+        this.guardado = true;
+        this.panelLienzo.setValidarModificado(false);
     }//GEN-LAST:event_IMNuevoLienzoActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+    private void MIAbrirLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MIAbrirLienzoActionPerformed
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("Abrir proyecto de Pixelfy");
+        selector.setFileFilter(new FileNameExtensionFilter("Proyectos Pixelfy (*.txt)", "txt"));
+
+        if (selector.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File archivo = selector.getSelectedFile();
+            GestorArchivos gestor = new GestorArchivos(archivo.getAbsolutePath());
+
+            if (!gestor.validarArchivo()) {
+                JOptionPane.showMessageDialog(this, "Archivo inválido o corrupto.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            gestor.cargarArchivo(this.lienzoActual);
+            this.panelLienzo.repaint();
+            setTitle("Pixelfy - Lienzo (" + lienzoActual.getFilas() + "x" + lienzoActual.getColumnas() + ")");
+        }
+        this.panelLienzo.setValidarModificado(false);
+    }//GEN-LAST:event_MIAbrirLienzoActionPerformed
+
+    private void IMGuardarLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IMGuardarLienzoActionPerformed
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("Guardar proyecto de Pixelfy");
+        selector.setFileFilter(new FileNameExtensionFilter("Archivos de texto (*.txt)", "txt"));
+
+        if (selector.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String ruta = selector.getSelectedFile().getAbsolutePath();
+            
+            // 1. Aseguramos que termine en .txt antes de verificar si existe
+            if (!ruta.toLowerCase().endsWith(".txt")) {
+                ruta += ".txt";
+            }
+
+            // 2. Creamos un objeto File con la ruta final para comprobar si ya existe
+            File archivoDestino = new File(ruta);
+            
+            if (archivoDestino.exists()) {
+                int respuesta = JOptionPane.showConfirmDialog(
+                        this,
+                        "Ya existe un archivo llamado \"" + archivoDestino.getName() + "\" en esta carpeta.\n¿Deseas sobrescribirlo?",
+                        "Archivo existente",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                // Si el usuario elige "No" o cierra la ventana, cancelamos el guardado
+                if (respuesta != JOptionPane.YES_OPTION) {
+                    return;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new VentanaPrincipal().setVisible(true));
-    }
+            // 3. Guardamos el archivo (ya sea nuevo o confirmando que se reemplaza)
+            try {
+                GestorArchivos gestor = new GestorArchivos(ruta);
+                gestor.guardarArchivo(this.lienzoActual);
+                this.guardado = true;
+                JOptionPane.showMessageDialog(this, "Lienzo guardado correctamente en:\n" + ruta);
+            } catch (HeadlessException ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ocurrió un error al guardar el archivo:\n" + ex.getMessage(),
+                        "Error al guardar",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+        this.panelLienzo.setValidarModificado(false);
+    }//GEN-LAST:event_IMGuardarLienzoActionPerformed
+
+    private void MILimpiarLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MILimpiarLienzoActionPerformed
+        int confirmar = JOptionPane.showConfirmDialog(this, 
+                "¿Seguro que quieres borrar todo el dibujo?", 
+                "Limpiar Lienzo", JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            this.lienzoActual.limpiarLienzo();
+            this.panelLienzo.repaint();
+        }
+        this.panelLienzo.setValidarModificado(false);
+    }//GEN-LAST:event_MILimpiarLienzoActionPerformed
+
+    private void miLapizActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miLapizActionPerformed
+        this.panelLienzo.setHerramienta(new Lapiz());
+    }//GEN-LAST:event_miLapizActionPerformed
+
+    private void miCubetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCubetaActionPerformed
+        this.panelLienzo.setHerramienta(new Cubeta());
+    }//GEN-LAST:event_miCubetaActionPerformed
+
+    private void miBorradorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miBorradorActionPerformed
+        this.panelLienzo.setHerramienta(new Borrador());
+    }//GEN-LAST:event_miBorradorActionPerformed
+
+    private void menuColorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuColorMouseClicked
+        Color colorSeleccionado = JColorChooser.showDialog(this, "seleccione un color", Color.BLACK);
+        //Se le aigna al color seleccionado en el selector a una bariable tipop color que
+        if(colorSeleccionado != null){
+            //Se verifica que exista y luego lo aplica a las herrmaientas
+            this.panelLienzo.setColorActual(colorSeleccionado);
+        }
+    }//GEN-LAST:event_menuColorMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem IMGuardarLienzo;
     private javax.swing.JMenuItem IMNuevoLienzo;
     private javax.swing.JMenuItem MIAbrirLienzo;
     private javax.swing.JMenuItem MILimpiarLienzo;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenu mILapiz;
+    private javax.swing.JMenu menuColor;
     private javax.swing.JMenu menuOperaciones;
+    private javax.swing.JMenuItem miBorrador;
+    private javax.swing.JMenuItem miCubeta;
+    private javax.swing.JMenuItem miLapiz;
     // End of variables declaration//GEN-END:variables
 }
