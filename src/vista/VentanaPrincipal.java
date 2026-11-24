@@ -137,7 +137,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         miCubeta.addActionListener(this::miCubetaActionPerformed);
         mILapiz.add(miCubeta);
 
-        miBorrador.setText("borrador");
+        miBorrador.setText("Borrador");
         miBorrador.addActionListener(this::miBorradorActionPerformed);
         mILapiz.add(miBorrador);
 
