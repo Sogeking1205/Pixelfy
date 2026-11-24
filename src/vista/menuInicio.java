@@ -141,10 +141,11 @@ public class menuInicio extends javax.swing.JFrame {
             gestor.cargarArchivo(lienzoCargado);
 
             // 4. Abrimos el editor ya con el dibujo 
-            new VentanaPrincipal(lienzoCargado).setVisible(true);
+            VentanaPrincipal ventana = new VentanaPrincipal(lienzoCargado);
+            ventana.setVisible(true);
             this.dispose();
 
-            JOptionPane.showMessageDialog(this, 
+            JOptionPane.showMessageDialog(ventana, 
                 "Proyecto cargado: " + lienzoCargado.getFilas() + "x" + lienzoCargado.getColumnas());
         }
     }//GEN-LAST:event_btnAbrirLienzoActionPerformed
@@ -168,10 +169,11 @@ public class menuInicio extends javax.swing.JFrame {
             // 1. Creamos el modelo Lienzo con las dimensiones elegidas
             Lienzo nuevoLienzo = new Lienzo(dimension, dimension);
 
-            new VentanaPrincipal(nuevoLienzo).setVisible(true);
+           VentanaPrincipal ventana = new VentanaPrincipal(nuevoLienzo);
+            ventana.setVisible(true);
             this.dispose();
 
-            JOptionPane.showMessageDialog(this, "Lienzo modelo creado: " + dimension + "x" + dimension);
+            JOptionPane.showMessageDialog(ventana, "Lienzo modelo creado: " + dimension + "x" + dimension);
         }
     }//GEN-LAST:event_btnLienzoNuevoActionPerformed
 
