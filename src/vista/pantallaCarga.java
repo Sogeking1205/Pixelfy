@@ -1,6 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package vista;
 
@@ -35,7 +35,7 @@ public class pantallaCarga extends javax.swing.JDialog {
                     ((javax.swing.Timer) e.getSource()).stop();
                     dispose(); // Cierra esta pantalla de carga
                     // abre la ventana principal
-                    new menuInicio().setVisible(true);
+                    new MenuInicio().setVisible(true);
                 }
             }
         });

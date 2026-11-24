@@ -6,7 +6,7 @@
  *
  * @author EMMA
  */
-package vista;
+package modelo;
 
 import java.awt.Color;
 import java.awt.Graphics;
