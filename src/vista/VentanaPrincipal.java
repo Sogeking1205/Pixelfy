@@ -17,6 +17,14 @@ import modelo.Cubeta;
 import modelo.GestorArchivos;
 import modelo.Lapiz;
 import modelo.Lienzo;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 /**
  *
  * @author asnu1
@@ -30,7 +38,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     private Lienzo lienzoActual;
     private PanelLienzo panelLienzo;
-    private boolean guardado = true;
+    private JButton btnDeshacer;
+    private JButton btnRehacer;
 
     // ESTE ES EL CONSTRUCTOR DE LA VENTANA
     public VentanaPrincipal(Lienzo lienzo) {
@@ -39,7 +48,21 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         
         this.panelLienzo = new PanelLienzo(this.lienzoActual);
         getContentPane().setLayout(new BorderLayout());
+
+        // Botones para deshacer y rehacer cambios
+        JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        btnDeshacer = new JButton("Deshacer (Ctrl+Z)");
+        btnRehacer = new JButton("Rehacer (Ctrl+Y)");
+        btnDeshacer.addActionListener(e -> panelLienzo.deshacer());
+        btnRehacer.addActionListener(e -> panelLienzo.rehacer());
+        panelAcciones.add(btnDeshacer);
+        panelAcciones.add(btnRehacer);
+
+        getContentPane().add(panelAcciones, BorderLayout.NORTH);
         getContentPane().add(panelLienzo, BorderLayout.CENTER);
+
+        this.panelLienzo.setOnHistorialCambiado(this::actualizarBotonesHistorial);
+        configurarAtajosTeclado();
         
         setLocationRelativeTo(null);
         setTitle("Pixelfy - Lienzo (" + lienzo.getFilas() + "x" + lienzo.getColumnas() + ")");
@@ -52,6 +75,30 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
                 confirmarSalida();
+            }
+        });
+    }
+    private void actualizarBotonesHistorial() {
+        btnDeshacer.setEnabled(panelLienzo.puedeDeshacer());
+        btnRehacer.setEnabled(panelLienzo.puedeRehacer());
+    }
+
+    private void configurarAtajosTeclado() {
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "deshacer");
+        getRootPane().getActionMap().put("deshacer", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panelLienzo.deshacer();
+            }
+        });
+
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "rehacer");
+        getRootPane().getActionMap().put("rehacer", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panelLienzo.rehacer();
             }
         });
     }
@@ -81,6 +128,25 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
     }
     
+    private boolean confirmarDescartarCambios() {
+        if (!panelLienzo.isValidarModificado()) {
+            return true;
+        }
+
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                "Tienes cambios sin guardar en tu lienzo.\n¿Deseas guardar antes de continuar?",
+                "Cambios sin guardar",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            IMGuardarLienzoActionPerformed(null);
+            return !panelLienzo.isValidarModificado();
+        }
+        return opcion == JOptionPane.NO_OPTION;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -168,6 +234,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void IMNuevoLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IMNuevoLienzoActionPerformed
+        if (!confirmarDescartarCambios()) {
+            return;
+        }
+
         String[] opciones = {"16x16", "32x32", "64x64"};
         String seleccion = (String) JOptionPane.showInputDialog(
                 this, "Selecciona el tamaño del lienzo:", "Nuevo Lienzo",
@@ -177,13 +247,16 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             int dim = Integer.parseInt(seleccion.split("x")[0]);
             this.lienzoActual = new Lienzo(dim, dim);
             this.panelLienzo.setLienzo(this.lienzoActual);
+            this.panelLienzo.setValidarModificado(false);
             setTitle("Pixelfy - Lienzo (" + dim + "x" + dim + ")");
         }
-        this.guardado = true;
-        this.panelLienzo.setValidarModificado(false);
     }//GEN-LAST:event_IMNuevoLienzoActionPerformed
 
     private void MIAbrirLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MIAbrirLienzoActionPerformed
+        if (!confirmarDescartarCambios()) {
+            return;
+        }
+
         JFileChooser selector = new JFileChooser();
         selector.setDialogTitle("Abrir proyecto de Pixelfy");
         selector.setFileFilter(new FileNameExtensionFilter("Proyectos Pixelfy (*.txt)", "txt"));
@@ -198,10 +271,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
 
             gestor.cargarArchivo(this.lienzoActual);
+            this.panelLienzo.limpiarHistorial();
+            this.panelLienzo.setValidarModificado(false);
             this.panelLienzo.repaint();
             setTitle("Pixelfy - Lienzo (" + lienzoActual.getFilas() + "x" + lienzoActual.getColumnas() + ")");
         }
-        this.panelLienzo.setValidarModificado(false);
     }//GEN-LAST:event_MIAbrirLienzoActionPerformed
 
     private void IMGuardarLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IMGuardarLienzoActionPerformed
@@ -239,9 +313,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             try {
                 GestorArchivos gestor = new GestorArchivos(ruta);
                 gestor.guardarArchivo(this.lienzoActual);
-                this.guardado = true;
+                this.panelLienzo.setValidarModificado(false);
                 JOptionPane.showMessageDialog(this, "Lienzo guardado correctamente en:\n" + ruta);
-            } catch (HeadlessException ex) {
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Ocurrió un error al guardar el archivo:\n" + ex.getMessage(),
@@ -250,7 +324,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 );
             }
         }
-        this.panelLienzo.setValidarModificado(false);
     }//GEN-LAST:event_IMGuardarLienzoActionPerformed
 
     private void MILimpiarLienzoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MILimpiarLienzoActionPerformed
@@ -259,10 +332,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 "Limpiar Lienzo", JOptionPane.YES_NO_OPTION);
 
         if (confirmar == JOptionPane.YES_OPTION) {
+            this.panelLienzo.guardarEstadoParaDeshacer();
             this.lienzoActual.limpiarLienzo();
+            this.panelLienzo.setValidarModificado(true);
             this.panelLienzo.repaint();
         }
-        this.panelLienzo.setValidarModificado(false);
     }//GEN-LAST:event_MILimpiarLienzoActionPerformed
 
     private void miLapizActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miLapizActionPerformed

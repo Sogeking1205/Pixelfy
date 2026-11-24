@@ -42,7 +42,7 @@ public class GestorArchivos implements Archivable{
                 for(int j=0; j<columnas; j++){
                     Casilla casilla = cuadricula[i][j];
                     String hex = casilla.getColor();
-                    if(hex == null || hex.isEmpty()){
+                    if(hex == null || hex.isEmpty() || hex.equalsIgnoreCase("blanco")){
                         hex = "#FFFFFF";
                     }
                     
@@ -68,7 +68,7 @@ public class GestorArchivos implements Archivable{
         //uso de Try-catch
         try(BufferedReader reader = new BufferedReader(new FileReader(getRutaArchivo()))){
             
-            String[] dimensiones = reader.readLine().split(" ");
+           String[] dimensiones = reader.readLine().trim().split("\\s+");
             int filas = Integer.parseInt(dimensiones[0]);
             int columnas = Integer.parseInt(dimensiones[1]);
             
@@ -79,11 +79,18 @@ public class GestorArchivos implements Archivable{
             //Aca se lee el archivo y se reconstruye
             for (int i = 0; i < filas; i++) {
                 String linea = reader.readLine();
-                String[] hexColores = linea.split(" ");
+                if (linea == null) {
+                    throw new IOException("Faltan filas en el archivo");
+                }
+                String[] hexColores = linea.trim().split("\\s+");
+                if (hexColores.length < columnas) {
+                    throw new IOException("Faltan columnas en el archivo");
+                }
                 
                 for (int j = 0; j < columnas; j++) {
                     // Modificamos color de cada Casilla con la guardada en el texto
-                    lienzoTemporal.pintarCasilla(i, j, hexColores[j]);
+                    String color = hexColores[j].equalsIgnoreCase("blanco") ? "#FFFFFF" : hexColores[j];
+                    lienzoTemporal.pintarCasilla(i, j, color);
                 }
             }
             
@@ -113,16 +120,17 @@ public class GestorArchivos implements Archivable{
             if(primeraLinea == null){
                 return false;
             }
+            
             //Aca dividiremos la primera linea para tener las filas y columnas guardadas.
-            String[] dimensiones = primeraLinea.split(" ");
+            String[] dimensiones = primeraLinea.trim().split("\\s+");
             if(dimensiones.length != 2){
                 return false;
             }
-            //Lee la division y verifica si son numeros 
-            Integer.parseInt(dimensiones[0]);
-            Integer.parseInt(dimensiones[1]);
+            //Lee la division y verifica si son numeros mayores a 0
+            int filas = Integer.parseInt(dimensiones[0]);
+            int columnas = Integer.parseInt(dimensiones[1]);
             
-            return true;
+            return filas > 0 && columnas > 0;
         }
         catch(Exception e){
             return false;

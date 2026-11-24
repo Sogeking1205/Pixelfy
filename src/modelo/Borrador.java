@@ -7,9 +7,9 @@ public class Borrador extends Herramienta{
     }
 
     @Override
-     public void aplicar (String[][] Lienzo, int x, int y, String color){
-         if (posicion(Lienzo, x, y)){
-            Lienzo[x][y] = "blanco";
-     }
-}
+    public void aplicar(String[][] Lienzo, int x, int y, String color) {
+        if (posicion(Lienzo, x, y)) {
+            Lienzo[x][y] = "#FFFFFF";
+        }
+    }
 }

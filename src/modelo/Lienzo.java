@@ -29,7 +29,7 @@ public class Lienzo {
     private void inicializarCuadricula() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                cuadricula[i][j] = new Casilla(i, j, "Blanco");
+                cuadricula[i][j] = new Casilla(i, j, "#FFFFFF");
             }
         }
     }
@@ -60,7 +60,7 @@ public class Lienzo {
     public void limpiarLienzo() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                cuadricula[i][j].setColor("Blanco");
+                cuadricula[i][j].setColor("#FFFFFF");
             }
         }
     }

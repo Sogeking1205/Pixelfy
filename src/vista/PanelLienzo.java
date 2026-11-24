@@ -19,6 +19,7 @@ import modelo.Casilla;
 import modelo.Herramienta;
 import modelo.Lapiz;
 import modelo.Lienzo;
+import java.util.Stack;
 
 public class PanelLienzo extends JPanel {
 
@@ -27,6 +28,11 @@ public class PanelLienzo extends JPanel {
     private String colorActual = "#000000"; // Negro por defecto
     private boolean mostrarCuadricula = true;
     private boolean validarModificado = false;
+    private static final int MAX_HISTORIAL = 50;
+    private Stack<String[][]> historialDeshacer = new Stack<>();
+    private Stack<String[][]> historialRehacer = new Stack<>();
+    private String[][] estadoPrevioTrazo = null;
+    private Runnable onHistorialCambiado;
     
 
     public PanelLienzo(Lienzo lienzo) {
@@ -34,11 +40,23 @@ public class PanelLienzo extends JPanel {
         this.herramientaActual = new Lapiz(); // Herramienta inicial por defecto
         setBackground(Color.WHITE);
 
-        // Detectar clics individuales
+       // Detectar clics individuales
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                estadoPrevioTrazo = capturarEstadoActual();
                 ejecutarHerramienta(e.getX(), e.getY());
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (estadoPrevioTrazo != null) {
+                    String[][] estadoActual = capturarEstadoActual();
+                    if (huboCambios(estadoPrevioTrazo, estadoActual)) {
+                        registrarEnHistorial(estadoPrevioTrazo);
+                    }
+                    estadoPrevioTrazo = null;
+                }
             }
         });
 
@@ -96,13 +114,7 @@ public class PanelLienzo extends JPanel {
 
         if (fila >= 0 && fila < filas && col >= 0 && col < columnas) {
             // 1. Extraer la matriz String[][] que esperan las herramientas
-            String[][] matrizColores = new String[filas][columnas];
-            Casilla[][] cuadricula = lienzo.getCuadricula();
-            for (int i = 0; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    matrizColores[i][j] = cuadricula[i][j].getColor();
-                }
-            }
+            String[][] matrizColores = capturarEstadoActual();
 
             // 2. Aplicar polimórficamente la herramienta activa (Lapiz, Borrador o Cubeta)
             herramientaActual.aplicar(matrizColores, fila, col, colorActual);
@@ -148,6 +160,7 @@ public class PanelLienzo extends JPanel {
 
     public void setLienzo(Lienzo lienzo) {
         this.lienzo = lienzo;
+        limpiarHistorial();
         repaint();
     }
 
@@ -167,5 +180,105 @@ public class PanelLienzo extends JPanel {
     public void setMostrarCuadricula(boolean mostrar) {
         this.mostrarCuadricula = mostrar;
         repaint();
+    }
+    // --- Métodos para deshacer y rehacer ---
+
+    private String[][] capturarEstadoActual() {
+        if (lienzo == null) return null;
+        int filas = lienzo.getFilas();
+        int columnas = lienzo.getColumnas();
+        String[][] copia = new String[filas][columnas];
+        Casilla[][] cuadricula = lienzo.getCuadricula();
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                String c = cuadricula[i][j].getColor();
+                if (c == null || c.trim().isEmpty() || c.equalsIgnoreCase("blanco")) {
+                    c = "#FFFFFF";
+                }
+                copia[i][j] = c.trim().toUpperCase();
+            }
+        }
+        return copia;
+    }
+
+    private void restaurarEstado(String[][] estado) {
+        if (lienzo == null || estado == null) return;
+        for (int i = 0; i < estado.length; i++) {
+            for (int j = 0; j < estado[i].length; j++) {
+                lienzo.pintarCasilla(i, j, estado[i][j]);
+            }
+        }
+        this.validarModificado = true;
+        repaint();
+        notificarCambioHistorial();
+    }
+
+    private boolean huboCambios(String[][] antes, String[][] despues) {
+        if (antes == null || despues == null) return false;
+        if (antes.length != despues.length || antes[0].length != despues[0].length) return true;
+        for (int i = 0; i < antes.length; i++) {
+            for (int j = 0; j < antes[i].length; j++) {
+                if (!antes[i][j].equalsIgnoreCase(despues[i][j])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void registrarEnHistorial(String[][] estadoAnterior) {
+        historialDeshacer.push(estadoAnterior);
+        if (historialDeshacer.size() > MAX_HISTORIAL) {
+            historialDeshacer.remove(0);
+        }
+        historialRehacer.clear();
+        notificarCambioHistorial();
+    }
+
+    public void guardarEstadoParaDeshacer() {
+        String[][] estadoActual = capturarEstadoActual();
+        if (estadoActual != null) {
+            registrarEnHistorial(estadoActual);
+        }
+    }
+
+    public boolean deshacer() {
+        if (historialDeshacer.isEmpty()) return false;
+        historialRehacer.push(capturarEstadoActual());
+        restaurarEstado(historialDeshacer.pop());
+        return true;
+    }
+
+    public boolean rehacer() {
+        if (historialRehacer.isEmpty()) return false;
+        historialDeshacer.push(capturarEstadoActual());
+        restaurarEstado(historialRehacer.pop());
+        return true;
+    }
+
+    public void limpiarHistorial() {
+        historialDeshacer.clear();
+        historialRehacer.clear();
+        estadoPrevioTrazo = null;
+        notificarCambioHistorial();
+    }
+
+    public boolean puedeDeshacer() {
+        return !historialDeshacer.isEmpty();
+    }
+
+    public boolean puedeRehacer() {
+        return !historialRehacer.isEmpty();
+    }
+
+    public void setOnHistorialCambiado(Runnable callback) {
+        this.onHistorialCambiado = callback;
+        notificarCambioHistorial();
+    }
+
+    private void notificarCambioHistorial() {
+        if (onHistorialCambiado != null) {
+            onHistorialCambiado.run();
+        }
     }
 }
