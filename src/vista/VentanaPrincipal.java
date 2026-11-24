@@ -279,7 +279,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     private void menuColorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuColorMouseClicked
         Color colorSeleccionado = JColorChooser.showDialog(this, "seleccione un color", Color.BLACK);
-        //Se le aigna al color seleccionado en el selector a una bariable tipop color que
         if(colorSeleccionado != null){
             //Se verifica que exista y luego lo aplica a las herrmaientas
             this.panelLienzo.setColorActual(colorSeleccionado);
