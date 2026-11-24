@@ -23,7 +23,7 @@ public class pantallaCarga extends javax.swing.JDialog {
     }
 
     private void iniciarCarga() {
-        javax.swing.Timer timer = new javax.swing.Timer(50, new java.awt.event.ActionListener() {
+        javax.swing.Timer timer = new javax.swing.Timer(15, new java.awt.event.ActionListener() {
             int progreso = 0;//inciamos la barra vacia
 
             @Override
