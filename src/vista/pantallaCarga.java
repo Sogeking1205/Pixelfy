@@ -35,7 +35,7 @@ public class pantallaCarga extends javax.swing.JDialog {
                     ((javax.swing.Timer) e.getSource()).stop();
                     dispose(); // Cierra esta pantalla de carga
                     // abre la ventana principal
-                    new MenuInicio().setVisible(true);
+                    new menuInicio().setVisible(true);
                 }
             }
         });

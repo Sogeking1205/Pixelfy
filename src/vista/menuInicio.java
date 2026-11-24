@@ -15,7 +15,7 @@ import modelo.Lienzo;
  */
 public class menuInicio extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MenuInicio.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(menuInicio.class.getName());
 
     /**
      * Creates new form menuInicio
